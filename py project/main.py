@@ -17,34 +17,34 @@ import secrets
 root = tk.Tk()
 root.geometry("800x400")
 root.title("hussen hady simulator")
+
+#generat the key and the defult data
 dd ={'scoree': 5 , 'increas':1} #defult data
 key = (b'dVW30NYHSQdQBuCr6DQ2EOoyGusaf02Pc6irahQO-vc=') #that the kye
-f = Fernet(key)
+f = Fernet(key) #crypt and decrypt
 
 
-
+# if data file dont existed or corrupted , generat a new file with defult data
 if not os.path.exists('data') or os.path.getsize('data')==0:
     with open('data','wb')as d:
-        hh= f.encrypt(json.dumps(dd).encode('utf-8'))
-        d.write(hh) 
-else :
+        hh= f.encrypt(json.dumps(dd).encode('utf-8')) #turn data var tipe from dictionary into json and encrypt yhis data by fernet
+        d.write(hh) # write encrypt data into the file
+else : #if data file already existid read the data
     with open('data','rb')as d:
         de=d.read()
-        hh= f.decrypt(de)
+        hh= f.decrypt(de) #decrypt the data
         
-
+#load func , chek if data file existed then decyipt the data and set new data to old data 
 def load():
     if os.path.exists('data') or os.path.getsize('data')!=0:
       with open('data','rb')as d:
         global dd
         de=d.read()
         hh= f.decrypt(de)
-        dd=json.loads((hh.decode()))
-        lable.config(text="score: "+str(dd['scoree']))
-
-            
-    
-
+        dd=json.loads((hh.decode())) #read data and turn it into dictionary
+        lable.config(text="score: "+str(dd['scoree'])) # show new data on label
+         
+# save data as json 
 def sav():
     print("saved")
     global dd
@@ -52,6 +52,7 @@ def sav():
         hh= f.encrypt(json.dumps(dd).encode('utf-8'))
         d.write(hh)
 
+#chek if score are greater than zero then sub 1 from it , and if score is lower than 0 show the lose message 
 def damg():
     global dd
     if dd['scoree'] > 0:
@@ -61,48 +62,30 @@ def damg():
     else:
         messagebox.showinfo("YOU LOSER", "YOU LOSE IDEOT")
         root.destroy()
-        
 
-def on_button_click():
-    new_windo=tk.Toplevel(root)
-    new_windo.title('stor')
-    flower = tk.Button(new_windo,command=buy_mint, borderwidth=0,text='flowe 4000$')
-    flower.config(compound='top')
-    flower.pack(side='right')
-
+#what this func doing is increas scor when the tea pot is clecked
 def score():
     dd['scoree']+= dd['increas']
     print(dd['scoree'])
     lable.config(text="score: "+str(dd['scoree']))
+    #take window and button high,wide 
     window_width = root.winfo_width()
     window_height = root.winfo_height()
     button_width = tea_pot.winfo_width()
     button_height = tea_pot.winfo_height()
     
-
-
+# using secrets to genrat random number depent on wide,higt 
     x = secrets.randbelow(window_width - button_width)
     y = secrets.randbelow(window_height - button_height)
-
+# set tea pot to the new position
     tea_pot.place(x=x, y=y)
 
-def buy_mint():
-    global incresed
-    global scor
-    if scor>3 :
-        scor-=5
-        lable.config(text="score: "+str(scor))
-        print("true")
-    else:
-        print("false")
-
-#score (text)
-
+#creat a label 
 lable = tk.Label(root,text="score")
 lable.pack(anchor="nw", padx=1, pady=1)
-#imgs
+#creat an imgs
 pot_photo = tk.PhotoImage(file="tea_pot.png").subsample(3, 3)
-#buttons
+#creat buttons
 
 load_b = tk.Button(root, command=load,text='load')
 load_b.config(compound='top')
@@ -115,4 +98,3 @@ tea_pot.config(compound='top')
 tea_pot.pack(side='left')
 damg()
 root.mainloop()
-
